@@ -1,0 +1,67 @@
+#Level 1
+
+git clone https://github.com/srikanthreddy-lectures/realgrande-backend2023.git
+cd realgrande-backend2023/
+#Change the ip in VSCODE
+#Create Dockerfile
+FROM node
+WORKDIR /app
+COPY . /app
+RUN npm install
+CMD ["npm","start"]
+EXPOSE 3002
+
+sudo docker build -t rg2_b .
+sudo docker tag rg2_b:latest scott2srikanth/rg2-backend:latest
+sudo docker login
+sudo docker push scott2srikanth/rg2-backend:latest
+
+cd ..
+
+git clone https://github.com/srikanthreddy-lectures/realgrande-frontend1-2023.git
+cd realgrande-frontend1-2023/
+#Change the ip in VSCODE
+#Recreate build file
+npm install
+npm run build
+#Create Dockerfile
+FROM ngnix
+COPY ./build /usr/share/nginx/html
+
+sudo docker build -t rg2_f .
+sudo docker tag rg2_f:latest scott2srikanth/rg2-frontend:latest
+sudo docker login
+sudo docker push scott2srikanth/rg2-frontend:latest
+
+#Level 2
+
+sudo apt-get update && sudo apt-get install docker.io -y
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+sudo usermod -aG docker $USER && newgrp docker
+
+minikube start
+minikube status
+
+#Level 3
+
+git clone https://github.com/srikanthreddy-lectures/k8_react_front_back_end.git
+
+minikube tunnel
+
+#Pod backend-service
+kubectl create -f backend-deploy.yaml 
+kubectl get svc
+kubectl port-forward --address 0.0.0.0 service/backend-service 3002:3002
+
+
+#Pod frontend-service
+kubectl create -f frontend-deploy.yaml 
+kubectl get svc
+kubectl port-forward --address 0.0.0.0 service/frontend-service 8080:80
